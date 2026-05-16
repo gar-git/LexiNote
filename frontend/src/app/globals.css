@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+:root {
+  --ln-navy: #0f1729;
+  --ln-navy-mid: #1a2d4a;
+  --ln-navy-soft: #243652;
+  --ln-paper: #eef2f9;
+  --ln-paper-deep: #e2e8f4;
+  --ln-accent: #3b82f6;
+  --ln-accent-soft: rgba(59, 130, 246, 0.12);
+  --page-fg: #1e293b;
+}
+
+@theme inline {
+  --color-background: var(--ln-paper);
+  --color-foreground: var(--page-fg);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  color: var(--page-fg);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--ln-paper);
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% -15%, var(--ln-accent-soft), transparent 55%),
+    linear-gradient(180deg, var(--ln-paper) 0%, var(--ln-paper-deep) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: rgba(59, 130, 246, 0.25);
+  color: #0f172a;
+}
