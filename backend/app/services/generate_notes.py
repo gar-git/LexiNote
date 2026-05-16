@@ -21,6 +21,25 @@ def _topic_bullets_for_mode(mode: Mode) -> tuple[int, int]:
     return settings.TOPICS_BALANCED, settings.BULLETS_PER_TOPIC_BALANCED
 
 
+def _is_quota_or_rate_limit(err_msg: str) -> bool:
+    msg = err_msg.lower()
+    return (
+        "429" in msg
+        or "quota" in msg
+        or "rate limit" in msg
+        or "rate-limit" in msg
+        or "resource exhausted" in msg
+    )
+
+
+def _quota_user_message() -> str:
+    return (
+        "Gemini API quota or rate limit reached for this API key. "
+        "Wait a few minutes and try again, or check usage at https://ai.dev/rate-limit. "
+        "Free-tier limits are shared between localhost and your deployed app."
+    )
+
+
 def _pick_snippet_instruction() -> str:
     return (
         "For each bullet, include citations.snippet as a DIRECT QUOTE taken verbatim from the SOURCE_TEXT. "
@@ -206,6 +225,8 @@ def generate_topics_with_gemini(*, source_text: str, mode: Mode) -> DeriveTopics
             except Exception as e:
                 err_msg = str(e)
                 model_attempt_errors.append(f"{model_name} ({label}): {err_msg}")
+                if _is_quota_or_rate_limit(err_msg):
+                    raise RuntimeError(_quota_user_message()) from e
                 msg = err_msg.lower()
                 if label == "json_mode" and (
                     "response mime type" in msg
@@ -226,9 +247,11 @@ def generate_topics_with_gemini(*, source_text: str, mode: Mode) -> DeriveTopics
             break
 
     if data is None:
+        combined = " | ".join(model_attempt_errors)
+        if _is_quota_or_rate_limit(combined):
+            raise RuntimeError(_quota_user_message())
         raise RuntimeError(
-            "Gemini could not produce valid topic JSON. "
-            + " | ".join(model_attempt_errors)[-2000:]
+            "Gemini could not produce valid topic JSON. " + combined[-2000:]
         )
 
     # Normalize IDs so the editor can render stable keys.

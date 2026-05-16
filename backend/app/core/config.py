@@ -12,10 +12,8 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str | None = None
     # Use a Flash model on free tier (avoid *-pro / gemini-pro-latest → quota errors).
     GEMINI_MODEL: str = "gemini-2.5-flash"
-    GEMINI_MODEL_FALLBACKS: List[str] = [
-        "gemini-2.0-flash",
-        "gemini-2.0-flash-lite",
-    ]
+    # One fallback only; extra models burn free-tier quota without helping.
+    GEMINI_MODEL_FALLBACKS: List[str] = ["gemini-2.0-flash"]
 
     # Redis connection for RQ + job state.
     REDIS_URL: str = "redis://localhost:6379/0"
