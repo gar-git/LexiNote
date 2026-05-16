@@ -10,14 +10,11 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     GEMINI_API_KEY: str | None = None
-    GEMINI_MODEL: str = "gemini-2.0-flash"
-    # If the configured model isn't available for your API key/account,
-    # try these alternatives in order.
+    # Use a Flash model on free tier (avoid *-pro / gemini-pro-latest → quota errors).
+    GEMINI_MODEL: str = "gemini-2.5-flash"
     GEMINI_MODEL_FALLBACKS: List[str] = [
-        "gemini-2.5-flash",
+        "gemini-2.0-flash",
         "gemini-2.0-flash-lite",
-        "gemini-flash-latest",
-        "gemini-pro-latest",
     ]
 
     # Redis connection for RQ + job state.
